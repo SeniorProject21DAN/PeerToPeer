@@ -42,6 +42,10 @@ export default function Home() {
         navigation.navigate('Chat', { roomID: room });
     }
 
+    const goToFire = () => {
+        navigation.navigate('Burst', {roomID: "none"});
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.inputContainer}>
@@ -67,6 +71,13 @@ export default function Home() {
                     title="Create Room"
                 />
                 <Text style={styles.textStyle}>Don't have a Room ID? Create One :)</Text>
+            </View>
+            <View style={styles.buttonContainer}>
+                <Button
+                    color='#007AFF'
+                    onPress={goToFire}
+                    title="Fireworks"
+                />
             </View>
         </View>
     )

@@ -7,6 +7,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 // Importing our screens
 import Home from './screens/Home';
 import Chat from './screens/Chat';
+import Burst from './screens/Burst';
 
 const Stack = createStackNavigator();
 
@@ -16,6 +17,7 @@ export default function App(){
             <Stack.Navigator>
                 <Stack.Screen name="Home" component={Home}/>
                 <Stack.Screen name="Chat" component={Chat}/>
+                <Stack.Screen name="Burst" component={Burst}/>
             </Stack.Navigator>
         </NavigationContainer>
     );
