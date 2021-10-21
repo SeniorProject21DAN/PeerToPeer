@@ -1,8 +1,3 @@
-// Chat screen code for a peer to peer app basic Hello World app
-// Based on: https://medium.com/nerd-for-tech/peer-to-peer-chat-app-using-webrtc-and-react-native-6c15759f92ec
-// Extended by: Andrew Baker
-// Date: 10.13.21
-
 import React, {useState, useRef, useEffect, useCallback} from 'react';
 import { RTCPeerConnection, RTCSessionDescription, RTCIceCandidate } from 'react-native-webrtc'
 import { GiftedChat } from 'react-native-gifted-chat';
@@ -14,24 +9,19 @@ const Chat = ({ route }) => {
   const peerRef = useRef();
   const socketRef = useRef();
   const otherUser = useRef();
-  const sendChannel = useRef(); // Data channel
+  const sendChannel = useRef();
   const { roomID } = route.params;
-  const [messages, setMessages] = useState([]); // Chats between the peers will be stored here
+  const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    // Step 1: Connect with the Signal server
-    socketRef.current = io.connect("<http://153.106.226.103>:9000"); // Address of the Signal server
+    socketRef.current = io.connect("http://153.106.226.103:9000");
+    socketRef.current.emit("join room", roomID); // Provide Room ID here
 
-    // Step 2: Join the room. If initiator we will create a new room otherwise we will join a room
-    socketRef.current.emit("join room", roomID); // Room ID
-
-    // Step 3: Waiting for the other peer to join the room
     socketRef.current.on("other user", userID => {
       callUser(userID);
       otherUser.current = userID;
     });
 
-    // Signals that both peers have joined the room
     socketRef.current.on("user joined", userID => {
       otherUser.current = userID;
     });
@@ -41,24 +31,20 @@ const Chat = ({ route }) => {
     socketRef.current.on("answer", handleAnswer);
 
     socketRef.current.on("ice-candidate", handleNewICECandidateMsg);
+
   }, []);
 
   function callUser(userID){
-    // This will initiate the call for the receiving peer
+    // This will initiate the call
     console.log("[INFO] Initiated a call")
     peerRef.current = Peer(userID);
     sendChannel.current = peerRef.current.createDataChannel("sendChannel");
     
-    // listen to incoming messages from other peer
+    // listen to incoming messages
     sendChannel.current.onmessage = handleReceiveMessage;
   }
 
   function Peer(userID) {
-    /* 
-       Here we are using Turn and Stun server
-       (ref: https://blog.ivrpowers.com/post/technologies/what-is-stun-turn-server/)
-    */
-
     const peer = new RTCPeerConnection({
       iceServers: [
           {
@@ -73,11 +59,12 @@ const Chat = ({ route }) => {
       });
     peer.onicecandidate = handleICECandidateEvent;
     peer.onnegotiationneeded = () => handleNegotiationNeededEvent(userID);
+
     return peer;
   }
 
   function handleNegotiationNeededEvent(userID){
-    // Offer made by the initiating peer to the receiving peer.
+    // Make Offer
     peerRef.current.createOffer().then(offer => {
        return peerRef.current.setLocalDescription(offer);
     })
@@ -93,10 +80,7 @@ const Chat = ({ route }) => {
   }
 
   function handleOffer(incoming) {
-    /*
-      Here we are exchanging config information
-      between the peers to establish communication
-    */
+    // Handle Offer made by the initiating peer
     console.log("[INFO] Handling Offer")
     peerRef.current = Peer();
     peerRef.current.ondatachannel = (event) => {
@@ -105,18 +89,7 @@ const Chat = ({ route }) => {
       console.log('[SUCCESS] Connection established')
     }
 
-    /*
-      Session Description: It is the config information of the peer
-      SDP stands for Session Description Protocol. The exchange
-      of config information between the peers happens using this protocol
-    */
     const desc = new RTCSessionDescription(incoming.sdp);
-
-    /* 
-       Remote Description : Information about the other peer
-       Local Description: Information about you 'current peer'
-    */
-
     peerRef.current.setRemoteDescription(desc).then(() => {
     }).then(() => {
       return peerRef.current.createAnswer();
@@ -133,13 +106,13 @@ const Chat = ({ route }) => {
   }
 
   function handleAnswer(message){
-    // Handle answer by the receiving peer
+    // Handle answer by the remote peer
     const desc = new RTCSessionDescription(message.sdp);
     peerRef.current.setRemoteDescription(desc).catch(e => console.log("Error handle answer", e));
   }
+
   
   function handleReceiveMessage(e){
-    // Listener for receiving messages from the peer
     console.log("[INFO] Message received from peer", e.data);
     const msg = [{
       _id: Math.random(1000).toString(),
@@ -150,16 +123,10 @@ const Chat = ({ route }) => {
       },
     }];
     setMessages(previousMessages => GiftedChat.append(previousMessages, msg))
+    // setMessages(messages => [...messages, {yours: false, value: e.data}]);
   };
 
   function handleICECandidateEvent(e) {
-    /*
-      ICE stands for Interactive Connectivity Establishment. Using this
-      peers exchange information over the intenet. When establishing a
-      connection between the peers, peers generally look for several 
-      ICE candidates and then decide which to choose best among possible
-      candidates
-    */
     if (e.candidate) {
         const payload = {
             target: otherUser.current,
@@ -177,10 +144,12 @@ function handleNewICECandidateMsg(incoming) {
 }
 
 function sendMessage(messages = []){
+  console.log(messages);
   sendChannel.current.send(messages[0].text);
   setMessages(previousMessages => GiftedChat.append(previousMessages, messages))
 }
 
+// console.log(messages);
   return (
     <GiftedChat
       messages = {messages}

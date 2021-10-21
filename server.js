@@ -13,6 +13,7 @@ const io = socket(server);
 const rooms = {};
 
 io.on('connection', socket => {
+    console.log("Connection")
     /*
         If a peer is initiator, he will create a new room
         otherwise if peer is receiver he will join the room
