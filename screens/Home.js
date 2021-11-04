@@ -6,79 +6,45 @@
 import React, { useState, useLayoutEffect } from 'react';
 import { Text, View, Button, TextInput, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
-
-const BLUE = "#007AFF";
-const BLACK = "#000000";
-const LENGTH = 6; // Length of the Room ID
+import WebSocket from 'ws';
 
 export default function Home() {
     const navigation = useNavigation();
-    const [roomID, setRoomId] = useState('');
 
-    // Generating random room id for the initiating peer
-    const generateID = () => {
-        var result = '';
-        var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        var charactersLength = characters.length;
-        for (var i = 0; i < LENGTH; i++) {
-            result += characters.charAt(Math.floor(Math.random() * charactersLength));
-        }
-        return result;
-    }
 
-    const handleSubmit = () => {
-        if (roomID !== '') {
-        	// Enter the room
-            navigation.navigate('Chat', { roomID: roomID });
-        }
-    }
+    // const express = require("express");
+    // const app = express();
 
-    const handleCreateSubmit = () => {
-    	// Make a new room ID
-    	const room = generateID();
-    	console.log(room); // Share this room id to another peer in order to join in the same room
-    	setRoomId(room);
-        navigation.navigate('Chat', { roomID: room });
-    }
+    // const http = require("http");
+    // const WebSocket = require("ws");
 
-    const goToFire = () => {
-        navigation.navigate('Burst', {roomID: "none"});
-    }
+    // const server = http.createServer(app);
+    // const wss = new WebSocket.Server({ server });
+
+    // wss.on("connection", function connection(ws) {
+    //     ws.on("message", function incoming(message, isBinary) {
+    //         console.log(message.toString(), isBinary);
+
+    //         wss.clients.forEach(function each(client) {
+    //             if (client.readyState === WebSocket.OPEN) {
+    //                 client.send(message.toString());
+    //             }
+    //         });
+    //     });
+    // });
+
+    // app.get("/", (req, res) => {
+    //     res.send("Hello World!");
+    // });
+
+    // server.listen(8080, () => {
+    //     console.log("Listening to port 8080");
+    // });
+
 
     return (
         <View style={styles.container}>
-            <View style={styles.inputContainer}>
-                <Text style={{ alignSelf: 'center', fontSize: 24, margin: 8, fontWeight: 'bold' }}>P2P WEBRTC</Text>
-                <TextInput
-                    placeholder="Room ID"
-                    selectionColor="#DDD"
-                    onChangeText={(text) => setRoomId(text)}
-                    style={styles.textInput}
-                />
-            </View>
-            <View style={styles.buttonContainer}>
-                <Button
-                    color='#007AFF'
-                    onPress={handleSubmit}
-                    title="Join Room"
-                />
-            </View>
-            <View style={styles.buttonContainer}>
-                <Button
-                    color='#007AFF'
-                    onPress={handleCreateSubmit}
-                    title="Create Room"
-                />
-                <Text style={styles.textStyle}>Don't have a Room ID? Create One :)</Text>
-            </View>
-            <View style={styles.buttonContainer}>
-                <Button
-                    color='#007AFF'
-                    onPress={goToFire}
-                    title="Fireworks"
-                />
-            </View>
+            <Text>Home</Text>
         </View>
     )
 }
