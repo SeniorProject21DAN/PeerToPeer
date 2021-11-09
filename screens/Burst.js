@@ -1,72 +1,83 @@
-import React from 'react';
-import { Button, Platform, Text, Vibration, View, SafeAreaView, StyleSheet } from 'react-native';
+// 
+// Extended by: Andrew Baker
+// Date: 10.13.21
 
-const Separator = () => {
-  return <View style={Platform.OS === 'android' ? styles.separator : null} />;
-};
+import React, { useState, useLayoutEffect } from 'react';
+import { Text, View, Button, TextInput, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import WebSocket from 'ws';
 
-const App = () => {
-  const ONE_SECOND_IN_MS = 1000;
+export default function Burst() {
+    const navigation = useNavigation();
 
-  const PATTERN = [1 * ONE_SECOND_IN_MS, 2 * ONE_SECOND_IN_MS, 3 * ONE_SECOND_IN_MS];
+    // const express = require("express");
+    
+    // const app = express();
 
-  const PATTERN_DESC =
-    Platform.OS === 'android'
-      ? 'wait 1s, vibrate 2s, wait 3s'
-      : 'wait 1s, vibrate, wait 2s, vibrate, wait 3s';
+    // const http = require("http");
+    // const WebSocket = require("ws");
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <Text style={[styles.header, styles.paragraph]}>Vibration API</Text>
-      <View>
-        <Button title="Vibrate once" onPress={() => Vibration.vibrate()} />
-      </View>
-      <Separator />
-      {Platform.OS == 'android'
-        ? [
-            <View>
-              <Button
-                title="Vibrate for 10 seconds"
-                onPress={() => Vibration.vibrate(10 * ONE_SECOND_IN_MS)}
-              />
-            </View>,
-            <Separator />,
-          ]
-        : null}
-      <Text style={styles.paragraph}>Pattern: {PATTERN_DESC}</Text>
-      <Button title="Vibrate with pattern" onPress={() => Vibration.vibrate(PATTERN)} />
-      <Separator />
-      <Button
-        title="Vibrate with pattern until cancelled"
-        onPress={() => Vibration.vibrate(PATTERN, true)}
-      />
-      <Separator />
-      <Button title="Stop vibration pattern" onPress={() => Vibration.cancel()} color="#FF0000" />
-    </SafeAreaView>
-  );
-};
+    // const server = http.createServer(app);
+    // const wss = new WebSocket.Server({ server });
+
+    // wss.on("connection", function connection(ws) {
+    //     ws.on("message", function incoming(message, isBinary) {
+    //         console.log(message.toString(), isBinary);
+
+    //         wss.clients.forEach(function each(client) {
+    //             if (client.readyState === WebSocket.OPEN) {
+    //                 client.send(message.toString());
+    //             }
+    //         });
+    //     });
+    // });
+
+    // app.get("/", (req, res) => {
+    //     res.send("Hello World!");
+    // });
+
+    // server.listen(8080, () => {
+    //     console.log("Listening to port 8080");
+    // });
+
+
+    return (
+        <View style={styles.container}>
+            <Text>Home</Text>
+        </View>
+    )
+}
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingTop: 44,
-    padding: 8,
-  },
-  header: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  paragraph: {
-    margin: 24,
-    textAlign: 'center',
-  },
-  separator: {
-    marginVertical: 8,
-    borderBottomColor: '#737373',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
+    container: {
+        flex: 1,
+        backgroundColor: '#F8F8FF',
+    },
+    textInput: {
+        height: 55,
+        paddingLeft: 15,
+        paddingRight: 15,
+        backgroundColor: '#fff',
+        fontSize: 18,
+        borderWidth: .5,
+    },
+    inputContainer: {
+        paddingLeft: 10,
+        paddingRight: 10,
+        margin: 10,
+    },
+    buttonContainer: {
+        padding: 15,
+    },
+    textStyle: {
+        alignSelf: 'center',
+        color: '#D3D3D3',
+        marginTop: 5,
+    },
+    errorStyle: {
+        alignSelf: 'center',
+        color: '#ff0000',
+        marginBottom: 5,
+        fontSize: 12,
+    }
 });
-
-export default App;

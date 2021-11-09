@@ -15,9 +15,9 @@ export default function App(){
     return(
         <NavigationContainer>
             <Stack.Navigator>
-                {/* <Stack.Screen name="Home" component={Home}/> */}
+                <Stack.Screen name="Home" component={Home}/>
                 <Stack.Screen name="Chat" component={Chat}/>
-                {/* <Stack.Screen name="Burst" component={Burst}/> */}
+                <Stack.Screen name="Burst" component={Burst}/>
             </Stack.Navigator>
         </NavigationContainer>
     );

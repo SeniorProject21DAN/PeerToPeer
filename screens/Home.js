@@ -1,5 +1,4 @@
-// Home screen code for a peer to peer app basic Hello World app
-// Based on: https://medium.com/nerd-for-tech/peer-to-peer-chat-app-using-webrtc-and-react-native-6c15759f92ec
+// 
 // Extended by: Andrew Baker
 // Date: 10.13.21
 
@@ -11,40 +10,30 @@ import WebSocket from 'ws';
 export default function Home() {
     const navigation = useNavigation();
 
+    const Chat = () => {
+        navigation.navigate('Chat');
+    }
 
-    // const express = require("express");
-    // const app = express();
-
-    // const http = require("http");
-    // const WebSocket = require("ws");
-
-    // const server = http.createServer(app);
-    // const wss = new WebSocket.Server({ server });
-
-    // wss.on("connection", function connection(ws) {
-    //     ws.on("message", function incoming(message, isBinary) {
-    //         console.log(message.toString(), isBinary);
-
-    //         wss.clients.forEach(function each(client) {
-    //             if (client.readyState === WebSocket.OPEN) {
-    //                 client.send(message.toString());
-    //             }
-    //         });
-    //     });
-    // });
-
-    // app.get("/", (req, res) => {
-    //     res.send("Hello World!");
-    // });
-
-    // server.listen(8080, () => {
-    //     console.log("Listening to port 8080");
-    // });
-
+    const Server = () => {
+        navigation.navigate('Burst');
+    }
 
     return (
         <View style={styles.container}>
-            <Text>Home</Text>
+            <View style={styles.buttonContainer}>
+                <Button
+                    color='#007AFF'
+                    onPress={Chat}
+                    title="Chat"
+                />
+            </View>
+            <View style={styles.buttonContainer}>
+                <Button
+                    color='#007AFF'
+                    onPress={Server}
+                    title="Server"
+                />
+            </View>
         </View>
     )
 }
