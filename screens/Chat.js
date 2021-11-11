@@ -16,7 +16,7 @@ export default function App() {
   const [inputFieldEmpty, setInputFieldEmpty] = React.useState(true);
   const [serverMessages, setServerMessages] = React.useState([]);
 
-  var ws = React.useRef(new WebSocket('ws://w567l.sse.codesandbox.io/')).current;
+  var ws = React.useRef(new WebSocket('ws:153.106.95.97:8080')).current;   //This needs to altered to the IP of the server when attempting to get this to run. Double check each time. 
 
 
   React.useEffect(() => {

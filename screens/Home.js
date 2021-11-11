@@ -15,7 +15,7 @@ export default function Home() {
     }
 
     const Server = () => {
-        navigation.navigate('Burst');
+        navigation.navigate('Host');
     }
 
     return (

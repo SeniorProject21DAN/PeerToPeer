@@ -1,62 +1,38 @@
-// Server code for a peer to peer app basic Hello World app
-// Based on: https://medium.com/nerd-for-tech/peer-to-peer-chat-app-using-webrtc-and-react-native-6c15759f92ec
-// Extended by: Andrew Baker
-// Date: 10.13.21
-
-const express =  require('express');
-const http = require('http');
+const express = require("express");
 const app = express();
+const http = require("http");
+const WebSocket = require("ws");
+
+const hosts = new Set();
+const clients;
+
 const server = http.createServer(app);
-const socket = require('socket.io');
-const io = socket(server);
+const wss = new WebSocket.Server({ server });
 
-const rooms = {};
-
-io.on('connection', socket => {
-    /*
-        If a peer is initiator, he will create a new room
-        otherwise if peer is receiver he will join the room
-    */
-    socket.on('join room', roomID => {
-
-        if(rooms[roomID]){
-            // Receiving peer joins the room
-            rooms[roomID].push(socket.id)
+wss.on("connection", function connection(ws) {
+    ws.on("message", function incoming(message, isBinary) {
+        console.log(message.toString(), isBinary);
+        if (message.toString().substring(0, 3) === "host"){
+            hosts.add(ws);
+        } else if (message.toString().substring(0, 5) === "client") {
+            clients.push(new Set());
         }
-        else{
-            // Initiating peer create a new room
-            rooms[roomID] = [socket.id];
-        }
-
-        /*
-            If both initiating and receiving peer joins the room,
-            we will get the other user details.
-            For initiating peer it would be receiving peer and vice versa.
-        */
-        const otherUser = rooms[roomID].find(id => id !== socket.id);
-        if(otherUser){
-            socket.emit("other user", otherUser);
-            socket.to(otherUser).emit("user joined", socket.id);
-        }
+        wss.clients.forEach(function each(client) {
+            if (client.readyState === WebSocket.OPEN) {
+                client.send(message.toString());
+            }
+        });
     });
 
-    /*
-        The initiating peer offers a connection
-    */
-    socket.on('offer', payload => {
-        io.to(payload.target).emit('offer', payload);
+    ws.on("close", function (){
+        clients.delete(ws);
     });
-
-    /*
-        The receiving peer answers (accepts) the offer
-    */
-    socket.on('answer', payload => {
-        io.to(payload.target).emit('answer', payload);
-    });
-
-    socket.on('ice-candidate', incoming => {
-        io.to(incoming.target).emit('ice-candidate', incoming.candidate);
-    })
 });
 
-server.listen(9000, () => console.log("Server is up and running on Port 9000"));
+app.get("/", (req, res) => {
+    res.send("Hello World!");
+});
+
+server.listen(8080, () => {
+    console.log("Listening to port 8080");
+});
