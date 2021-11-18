@@ -6,7 +6,7 @@ import React, { useState, useLayoutEffect } from 'react';
 import { Text, View, Button, TextInput, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-export default function Host() {
+export default function Client() {
     const navigation = useNavigation();
 
     // const [serverState, setServerState] = React.useState('Loading...');
@@ -15,13 +15,13 @@ export default function Host() {
     // const [inputFieldEmpty, setInputFieldEmpty] = React.useState(true);
     // const [serverMessages, setServerMessages] = React.useState([]);
 
-    var ws = React.useRef(new WebSocket('ws:153.106.226.103:8080')).current;   //This needs to altered to the IP of the server when attempting to get this to run. Double check each time. 
+    var ws = React.useRef(new WebSocket('ws:153.106.95.97:8080')).current;   //This needs to altered to the IP of the server when attempting to get this to run. Double check each time. 
 
 
     React.useEffect(() => {
         const serverMessagesList = [];
         ws.onopen = () => {
-            ws.send("s:h:baker");
+            ws.send("s:c:baker");
             // setServerState('Connected to the server')
             // setDisableButton(false);
         };
@@ -50,12 +50,12 @@ export default function Host() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.textStyle}>Host</Text>
+            <Text style={styles.textStyle}>Client</Text>
             <View style={styles.buttonContainer}>
                 <Button
                     color='#007AFF'
                     onPress={send}
-                    title="Host send"
+                    title="Client send"
                 />
             </View>
         </View>

@@ -17,7 +17,6 @@ const WebSocket = require("ws");
 
 const hostList = new Array();
 const connections = new Array();
-// 153.106.92.43
 
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
@@ -34,8 +33,9 @@ wss.on("connection", function connection(ws) {
             if (messageType(message, "h", 2)) {                                     //Host set up
                 if (hostExists(message.toString().substring(4, 9)) === -1) {
                     hostList.push(message.toString().substring(4, 9));
-                    connections.push(new Array(ws));
-                    roomNum = connections.length;
+                    connections.push(new Array());
+                    roomNum = connections.length - 1;
+                    connections[roomNum].push(ws);
                     isHost = true;
                     roomID = message.toString().substring(4, 9);
                     console.log("Host Created!");
@@ -47,10 +47,9 @@ wss.on("connection", function connection(ws) {
             } else if (messageType(message, "c", 2)) {                              //Client or player set up 
 
                 let host = hostExists(message.toString().substring(4, 9));
-                console.log(message.toString().substring(4, 9));
                 if (host !== -1) {                                                  //Need to send confirmation message
                     connections[host].push(ws);
-                    roomNum = connections.length;
+                    roomNum = host;
                     isHost = false;
                     roomID = message.toString().substring(4, 9);
                     console.log("Client Created!");

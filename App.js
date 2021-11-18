@@ -8,6 +8,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Home from './screens/Home';
 import Chat from './screens/Chat';
 import Host from './screens/Host';
+import Client from './screens/Client'
 
 const Stack = createStackNavigator();
 
@@ -18,6 +19,7 @@ export default function App(){
                 <Stack.Screen name="Home" component={Home}/>
                 <Stack.Screen name="Chat" component={Chat}/>
                 <Stack.Screen name="Host" component={Host}/>
+                <Stack.Screen name="Client" component={Client}/>
             </Stack.Navigator>
         </NavigationContainer>
     );
