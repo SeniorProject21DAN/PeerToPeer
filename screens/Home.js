@@ -5,7 +5,6 @@
 import React, { useState, useLayoutEffect } from 'react';
 import { Text, View, Button, TextInput, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import WebSocket from 'ws';
 
 export default function Home() {
     const navigation = useNavigation();
@@ -14,8 +13,12 @@ export default function Home() {
         navigation.navigate('Chat');
     }
 
-    const Server = () => {
-        navigation.navigate('Burst');
+    const Host = () => {
+        navigation.navigate('Host');
+    }
+    
+    const Client = () => {
+        navigation.navigate('Client');
     }
 
     return (
@@ -23,15 +26,22 @@ export default function Home() {
             <View style={styles.buttonContainer}>
                 <Button
                     color='#007AFF'
-                    onPress={Chat}
-                    title="Chat"
+                    onPress={Host}
+                    title="Host"
                 />
             </View>
             <View style={styles.buttonContainer}>
                 <Button
                     color='#007AFF'
-                    onPress={Server}
-                    title="Server"
+                    onPress={Client}
+                    title="Client"
+                />
+            </View>
+            <View style={styles.buttonContainer}>
+                <Button
+                    color='#007AFF'
+                    onPress={Chat}
+                    title="Chat"
                 />
             </View>
         </View>
