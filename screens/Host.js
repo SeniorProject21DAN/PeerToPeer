@@ -46,18 +46,19 @@ export default function Host() {
 
     const send = () => {
         console.log("placeholder");
+        ws.send("m:buzz");
     }
 
     return (
         <View style={styles.container}>
-            <Text style={styles.textStyle}>Host</Text>
             <View style={styles.buttonContainer}>
                 <Button
                     color='#007AFF'
                     onPress={send}
-                    title="Host send"
+                    title="BUZZ"
                 />
             </View>
+            <Text style={styles.textStyle}>Press the button to send a buzz to the players</Text>
         </View>
     )
 }

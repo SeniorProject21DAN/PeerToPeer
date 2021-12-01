@@ -23,6 +23,11 @@ export default function Home() {
 
     return (
         <View style={styles.container}>
+
+            <TextInput style = {styles.textInput}
+                placeholder = "Room Code" 
+                // onChangeText = {}
+                />
             <View style={styles.buttonContainer}>
                 <Button
                     color='#007AFF'
@@ -37,13 +42,13 @@ export default function Home() {
                     title="Client"
                 />
             </View>
-            <View style={styles.buttonContainer}>
+            {/* <View style={styles.buttonContainer}>
                 <Button
                     color='#007AFF'
                     onPress={Chat}
                     title="Chat"
                 />
-            </View>
+            </View> */}
         </View>
     )
 }

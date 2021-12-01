@@ -3,7 +3,7 @@
 // Date: 10.13.21
 
 import React, { useState, useLayoutEffect } from 'react';
-import { Text, View, Button, TextInput, StyleSheet } from 'react-native';
+import { Text, View, Button, TextInput, StyleSheet, Vibration } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 export default function Client() {
@@ -34,15 +34,13 @@ export default function Client() {
         };
         ws.onmessage = (e) => {
             console.log(e);
+            if (e == "buzz"){
+                Vibration.vibrate();
+            }
             // serverMessagesList.push(e.data);
             // setServerMessages([...serverMessagesList])
         };
     }, [])
-    const submitMessage = () => {
-        ws.send(messageText);
-        // setMessageText('')
-        // setInputFieldEmpty(true)
-    }
 
     const send = () => {
         console.log("placeholder");
@@ -50,14 +48,14 @@ export default function Client() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.textStyle}>Client</Text>
-            <View style={styles.buttonContainer}>
+            <Text style={styles.textStyle}>Player Waiting for Buzz</Text>
+            {/* <View style={styles.buttonContainer}>
                 <Button
                     color='#007AFF'
                     onPress={send}
                     title="Client send"
                 />
-            </View>
+            </View> */}
         </View>
     )
 }
