@@ -15,12 +15,13 @@ export default function Host() {
     // const [inputFieldEmpty, setInputFieldEmpty] = React.useState(true);
     // const [serverMessages, setServerMessages] = React.useState([]);
 
-    var ws = React.useRef(new WebSocket('ws:153.106.226.103:8080')).current;   //This needs to altered to the IP of the server when attempting to get this to run. Double check each time. 
+    var ws = React.useRef(new WebSocket('ws:153.106.227.243:8080')).current;   //This needs to altered to the IP of the server when attempting to get this to run. Double check each time. 
 
 
     React.useEffect(() => {
         const serverMessagesList = [];
         ws.onopen = () => {
+            // console.log("Connection Attempt.");
             ws.send("s:h:baker");
             // setServerState('Connected to the server')
             // setDisableButton(false);
@@ -45,7 +46,7 @@ export default function Host() {
     }
 
     const send = () => {
-        console.log("placeholder");
+        // console.log("placeholder");
         ws.send("m:buzz");
     }
 

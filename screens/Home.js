@@ -25,7 +25,7 @@ export default function Home() {
         <View style={styles.container}>
 
             <TextInput style = {styles.textInput}
-                placeholder = "Room Code" 
+                placeholder = "Room Code (Current Default: baker)" 
                 // onChangeText = {}
                 />
             <View style={styles.buttonContainer}>

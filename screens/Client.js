@@ -15,7 +15,7 @@ export default function Client() {
     // const [inputFieldEmpty, setInputFieldEmpty] = React.useState(true);
     // const [serverMessages, setServerMessages] = React.useState([]);
 
-    var ws = React.useRef(new WebSocket('ws:153.106.95.97:8080')).current;   //This needs to altered to the IP of the server when attempting to get this to run. Double check each time. 
+    var ws = React.useRef(new WebSocket('ws:153.106.227.243:8080')).current;   //This needs to altered to the IP of the server when attempting to get this to run. Double check each time. 
 
 
     React.useEffect(() => {
@@ -33,8 +33,8 @@ export default function Client() {
             // setServerState(e.message);
         };
         ws.onmessage = (e) => {
-            console.log(e);
-            if (e == "buzz"){
+            // console.log(e);
+            if (e.data == "m:buzz"){
                 Vibration.vibrate();
             }
             // serverMessagesList.push(e.data);
