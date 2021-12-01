@@ -43,7 +43,8 @@ wss.on("connection", function connection(ws) {
                 } else {                                                            //Return Error, host already exists
                     console.log("Error in host connection: host already exists");
                     ws.send("Error in host connection: host already exists");
-                }
+                    ws.close();
+		}
             } else if (messageType(message, "c", 2)) {                              //Client or player set up 
 
                 let host = hostExists(message.toString().substring(4, 9));
@@ -57,17 +58,20 @@ wss.on("connection", function connection(ws) {
                 } else {                                                            //Send error message, host does not exist
                     console.log("Error in client connection: host does not exist");
                     ws.send("Error in client connection: host does not exist");
+		    ws.close();
                 }
             } else {                                                                //Send error message, invalid input
                 console.log("Error in connection: invalid input");
                 ws.send("Error in connection: invalid input");
+		ws.close();
             }
         } else if (messageType(message, "m", 0)) {                                   //If message
             if (isHost) {
                 connections[roomNum].forEach(function each(client) {
                     if (client.readyState === WebSocket.OPEN) {
                         client.send(message.toString());
-                    }
+                    	console.log("Sending Message");
+		    }
                 });
             } else {
                 connections[roomNum][0].send(message.toString());
@@ -75,6 +79,7 @@ wss.on("connection", function connection(ws) {
         } else {                                                                    //Send error message, invalid input
             console.log("Error: invalid Input");
             ws.send("Error: invalid Input");
+	    ws.close();
         }
 
         // wss.clients.forEach(function each(client) {
