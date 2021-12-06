@@ -3,7 +3,7 @@
 // Date: 10.13.21
 
 import React, { useState, useLayoutEffect } from 'react';
-import { Text, View, Button, TextInput, StyleSheet } from 'react-native';
+import { Text, View, Button, TextInput, StyleSheet, Vibration } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 export default function Client() {
@@ -15,7 +15,7 @@ export default function Client() {
     // const [inputFieldEmpty, setInputFieldEmpty] = React.useState(true);
     // const [serverMessages, setServerMessages] = React.useState([]);
 
-    var ws = React.useRef(new WebSocket('ws:153.106.95.97:8080')).current;   //This needs to altered to the IP of the server when attempting to get this to run. Double check each time. 
+    var ws = React.useRef(new WebSocket('ws:153.106.227.243:8080')).current;   //This needs to altered to the IP of the server when attempting to get this to run. Double check each time. 
 
 
     React.useEffect(() => {
@@ -33,16 +33,14 @@ export default function Client() {
             // setServerState(e.message);
         };
         ws.onmessage = (e) => {
-            console.log(e);
+            // console.log(e);
+            if (e.data == "m:buzz"){
+                Vibration.vibrate();
+            }
             // serverMessagesList.push(e.data);
             // setServerMessages([...serverMessagesList])
         };
     }, [])
-    const submitMessage = () => {
-        ws.send(messageText);
-        // setMessageText('')
-        // setInputFieldEmpty(true)
-    }
 
     const send = () => {
         console.log("placeholder");
@@ -50,14 +48,14 @@ export default function Client() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.textStyle}>Client</Text>
-            <View style={styles.buttonContainer}>
+            <Text style={styles.textStyle}>Player Waiting for Buzz</Text>
+            {/* <View style={styles.buttonContainer}>
                 <Button
                     color='#007AFF'
                     onPress={send}
                     title="Client send"
                 />
-            </View>
+            </View> */}
         </View>
     )
 }
