@@ -87,6 +87,10 @@ wss.on("connection", function connection(ws) {
     });
     ws.on("close", function () {
         console.log("Closed connection");
+        if (isHost){
+            delete hostList[roomNum];
+            delete connections[roomNum];
+        }
     });
 });
 
