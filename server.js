@@ -15,7 +15,9 @@ const app = express();
 const http = require("http");
 const WebSocket = require("ws");
 
+// Single dimension array storing name of host, used for host setup and client setup 
 const hostList = new Array();
+// Two dimensional array storing websocket address of host in [0] and of connected client n in [n]
 const connections = new Array();
 
 const server = http.createServer(app);
@@ -31,9 +33,14 @@ wss.on("connection", function connection(ws) {
 
         if (messageType(message, "s", 0)) {                                         //s is startup signifier
             if (messageType(message, "h", 2)) {                                     //Host set up
+
+
+
                 if (hostExists(message.toString().substring(4, 9)) === -1) {
+
                     hostList.push(message.toString().substring(4, 9));
                     connections.push(new Array());
+                    
                     roomNum = connections.length - 1;
                     connections[roomNum].push(ws);
                     isHost = true;
@@ -95,6 +102,8 @@ wss.on("connection", function connection(ws) {
         if (isHost){
             delete hostList[roomNum];
             delete connections[roomNum];
+            hostList[roomNum] = -1;                 //additional change to reuse former room numbers, prevent server space overflow
+            connections[roomNum] = -1;
         }
     });
 });
