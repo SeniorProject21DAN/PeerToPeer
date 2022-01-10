@@ -31,7 +31,7 @@ wss.on("connection", function connection(ws) {
     // boolean data, true for host, false for client
     let isHost;
     ws.on("message", function incoming(message, isBinary) {
-        console.log(message.toString(), isBinary);
+        // console.log(message.toString(), isBinary);
         // console.log(message);
 
         if (messageType(message, "s", 0)) {                                         //s is startup signifier
@@ -39,9 +39,9 @@ wss.on("connection", function connection(ws) {
             if (messageType(message, "h", 2)) {                                     //Host set up
                 if (hostExists(roomID) === -1) {
                     roomNum = hostHole();                                           // Tests for a hole in connections, fills the hole
-                    if (roomNum !== -1 ){
+                    if (roomNum !== -1) {
                         hostList[roomNum] = roomID;
-                        connections[roomNum] = ws;
+                        connections[roomNum][0] = ws;
                     } else {                                                        // Creates new slot in the hostList
                         hostList.push(roomID);
                         connections.push(new Array());
@@ -57,10 +57,11 @@ wss.on("connection", function connection(ws) {
                     console.log("Error in host connection: host already exists");
                     ws.send("Error in host connection: host already exists");
                     ws.close();
-		}
+                }
             } else if (messageType(message, "c", 2)) {                              //Client or player set up 
 
                 let host = hostExists(roomID);
+                console.log("Host Number: " + host);
                 if (host !== -1) {                                                  //Need to send confirmation message
                     connections[host].push(ws);
                     roomNum = host;
@@ -70,20 +71,20 @@ wss.on("connection", function connection(ws) {
                 } else {                                                            //Send error message, host does not exist
                     console.log("Error in client connection: host does not exist");
                     ws.send("Error in client connection: host does not exist");
-		            ws.close();
+                    ws.close();
                 }
             } else {                                                                //Send error message, invalid input
                 console.log("Error in connection: invalid input");
                 ws.send("Error in connection: invalid input");
-		        ws.close();
+                ws.close();
             }
         } else if (messageType(message, "m", 0)) {                                   //If message
             if (isHost) {
                 connections[roomNum].forEach(function each(client) {
                     if (client.readyState === WebSocket.OPEN) {
                         client.send(message.toString());
-                    	console.log("Sending Message");
-		    }
+                        console.log("Sending Message");
+                    }
                 });
             } else {
                 connections[roomNum][0].send(message.toString());
@@ -91,7 +92,7 @@ wss.on("connection", function connection(ws) {
         } else {                                                                    //Send error message, invalid input message
             console.log("Error: invalid Input");
             ws.send("Error: invalid Input");
-	        ws.close();
+            ws.close();
         }
 
         // wss.clients.forEach(function each(client) {
@@ -104,11 +105,13 @@ wss.on("connection", function connection(ws) {
     });
     ws.on("close", function () {
         console.log("Closed connection");
-        if (isHost){
+        if (isHost) {
             delete hostList[roomNum];
-            delete connections[roomNum];
-            hostList[roomNum] = -1;                 //additional change to reuse former room numbers, prevent server space overflow
-            connections[roomNum] = -1;
+            // delete connections[roomNum];
+            deleteClients(connections[roomNum]);
+            hostList[roomNum] = -1;                 //additional change to reuse former room numbers, prevent server overflow
+            // connections[roomNum][0] = -1;
+            console.log("Host Closed. Size of hostList: " + hostList.length);
         }
         // Currently when a connection closes only the host deletes values
         // When a client closes nothing happens, leaving its value within the connections array
@@ -138,11 +141,18 @@ function messageType(message, role, position) {
     return (message.toString().substring(position, position + 1) === role);
 }
 
-function hostHole(){
-    for (let i = 0; i < hostList.length; i += 1){
-        if (hostList[i] === -1){
+function hostHole() {
+    for (let i = 0; i < hostList.length; i += 1) {
+        if (hostList[i] === -1) {
             return i;
         }
     }
     return -1;
+}
+
+function deleteClients(clientArray) {
+    clientArray.forEach(function each(client) {
+        delete client;
+    }
+    );
 }
