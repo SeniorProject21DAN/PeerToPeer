@@ -56,7 +56,7 @@ wss.on("connection", function connection(ws) {
                         roomColumn = connections.length - 1;
                         connections[roomColumn].push(ws);
                     }
-
+                    roomRow = 0;
                     isHost = true;
                     console.log("Host Created!");
                     ws.send("Host Created!");
@@ -72,6 +72,7 @@ wss.on("connection", function connection(ws) {
                 console.log("Host Number: " + host);
                 if (host !== -1) {                                                  //Need to send confirmation message
                     connections[host].push(ws);
+                    roomRow = connections.length;                                   //roomRow set to the length of connections, given that connections has just been incremented
                     roomColumn = host;
                     isHost = false;
                     console.log("Client Created!");
@@ -94,8 +95,8 @@ wss.on("connection", function connection(ws) {
                         console.log("Sending Message");
                     }
                 });
-            } else {                                                                //If sender is a client
-                connections[roomColumn][0].send(message.toString());
+            } else {                                                                //If sender is a client, send messages exclusively to the host
+                connections[roomColumn][0].send(roomRow + ":" + message.toString());
             }
         } else {                                                                    //Send error message, invalid input message
             console.log("Error: invalid Input");
@@ -103,6 +104,7 @@ wss.on("connection", function connection(ws) {
             ws.close();
         }
 
+        // CODE TO MAKE SERVER ECHO ALL INPUT MESSAGES
         // wss.clients.forEach(function each(client) {
         //     if (client.readyState === WebSocket.OPEN) {
         //         client.send(message.toString());
