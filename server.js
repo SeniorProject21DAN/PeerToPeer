@@ -38,6 +38,8 @@ wss.on("connection", function connection(ws) {
     let roomID;
     // boolean data, true for host, false for client
     let isHost;
+    // string identifier for the host to view
+    let nickName;
     ws.on("message", function incoming(message, isBinary) {
         // console.log(message.toString(), isBinary);
         // console.log(message);
@@ -62,28 +64,28 @@ wss.on("connection", function connection(ws) {
                     ws.send("Host Created!");
 
                 } else {                                                            //Return Error, host already exists
-                    console.log("Error in host connection: host already exists");
+                    // console.log("Error in host connection: host already exists");
                     ws.send("Error in host connection: host already exists");
                     ws.close();
                 }
             } else if (messageType(message, "c", 2)) {                              //Client or player set up 
 
                 let host = hostExists(roomID);
-                console.log("Host Number: " + host);
+                // console.log("Host Number: " + host);
                 if (host !== -1) {                                                  //Need to send confirmation message
                     connections[host].push(ws);
                     roomRow = connections.length;                                   //roomRow set to the length of connections, given that connections has just been incremented
                     roomColumn = host;
                     isHost = false;
-                    console.log("Client Created!");
+                    // console.log("Client Created!");
                     ws.send("Client Created!");
                 } else {                                                            //Send error message, host does not exist
-                    console.log("Error in client connection: host does not exist");
+                    // console.log("Error in client connection: host does not exist");
                     ws.send("Error in client connection: host does not exist");
                     ws.close();
                 }
             } else {                                                                //Send error message, invalid input
-                console.log("Error in connection: invalid input");
+                // console.log("Error in connection: invalid input");
                 ws.send("Error in connection: invalid input");
                 ws.close();
             }
@@ -92,14 +94,14 @@ wss.on("connection", function connection(ws) {
                 connections[roomColumn].forEach(function each(client) {
                     if (client.readyState === WebSocket.OPEN) {
                         client.send(message.toString());
-                        console.log("Sending Message");
+                        // console.log("Sending Message");
                     }
                 });
             } else {                                                                //If sender is a client, send messages exclusively to the host
                 connections[roomColumn][0].send(roomRow + ":" + message.toString());
             }
         } else {                                                                    //Send error message, invalid input message
-            console.log("Error: invalid Input");
+            // console.log("Error: invalid Input");
             ws.send("Error: invalid Input");
             ws.close();
         }
@@ -121,7 +123,7 @@ wss.on("connection", function connection(ws) {
             deleteClients(connections[roomColumn]);
             hostList[roomColumn] = -1;                 //additional change to reuse former room numbers, prevent server overflow
             // connections[roomColumn][0] = -1;
-            console.log("Host Closed. Size of hostList: " + hostList.length);
+            // console.log("Host Closed. Size of hostList: " + hostList.length);
         }
         // Currently when a connection closes only the host deletes values
         // When a client closes nothing happens, leaving its value within the connections array
