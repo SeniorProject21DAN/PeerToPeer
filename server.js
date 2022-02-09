@@ -81,7 +81,7 @@ wss.on("connection", function connection(ws) {
                     roomColumn = host;
                     isHost = false;
                     // console.log("Client Created!");
-                    connections[roomColumn][0].send("New Connection From: " + nickName);
+                    connections[roomColumn][0].send(`New Connection From: ${nickName}`);
                     ws.send("Client Created!");
                 } else {                                                            //Send error message, host does not exist
                     // console.log("Error in client connection: host does not exist");
