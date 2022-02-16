@@ -107,7 +107,8 @@ wss.on("connection", function connection(ws) {
             } else if (isScreen) {
 
             } else {                                                                //If sender is a client, send messages exclusively to the host
-                connections[roomColumn][0].send(roomRow + ":" + message.toString());
+                connections[roomColumn][0].send(roomRow + ":" + message.toString());            //Sends the number of the client
+                // connections[roomColumn][0].send(nickName + ":" + message.toString());        //Version to be used when nickname is fully implemented
             }
         } else {                                                                    //Send error message, invalid input message
             // console.log("Error: invalid Input");
