@@ -46,7 +46,6 @@ wss.on("connection", function connection(ws) {
     let isValid = false;
     ws.on("message", function incoming(message, isBinary) {
         // console.log(message.toString(), isBinary);
-        // console.log(message);
 
         if (messageType(message, "s", 0)) {                                         //s is startup signifier
             roomID = message.toString().substring(4, 9);
@@ -65,7 +64,7 @@ wss.on("connection", function connection(ws) {
                     }
                     roomRow = 0;
                     isHost = true;
-                    console.log("Host Created!");
+                    // console.log("Host Created!");
                     ws.send("Host Created!");
 
                 } else {                                                            //Return Error, host already exists
@@ -83,7 +82,7 @@ wss.on("connection", function connection(ws) {
                     roomColumn = host;
                     isHost = false;
                     // console.log("Client Created!");
-                    connections[roomColumn][0].send(`New Connection From: ${nickName}`);
+                    connections[roomColumn][0].send(`${nickName}:OPEN`);
                     ws.send("Client Created!");
                 } else {                                                            //Send error message, host does not exist
                     // console.log("Error in client connection: host does not exist");
@@ -91,7 +90,7 @@ wss.on("connection", function connection(ws) {
                     ws.close();
                 }
             } else if (messageType(message, "s", 2)) {                              //Chromecast set up
-                console.log("Casting screen set up");
+                // console.log("Casting screen set up");
                 isScreen = true;
             } else {                                                                //Send error message, invalid input
                 // console.log("Error in connection: invalid input");
@@ -134,7 +133,7 @@ wss.on("connection", function connection(ws) {
 
     });
     ws.on("close", function () {
-        console.log("Closed connection");
+        // console.log("Closed connection");
         if (isHost) {
             delete hostList[roomColumn];
             // delete connections[roomColumn];
@@ -142,6 +141,8 @@ wss.on("connection", function connection(ws) {
             hostList[roomColumn] = -1;                 //additional change to reuse former room numbers, prevent server overflow
             // connections[roomColumn][0] = -1;
             // console.log("Host Closed. Size of hostList: " + hostList.length);
+        } else {
+            connections[roomColumn][0].send(nickName + ":CLOSED");
         }
         // Currently when a connection closes only the host deletes values
         // When a client closes nothing happens, leaving its value within the connections array
