@@ -36,19 +36,23 @@ wss.on("connection", function connection(ws) {
     let roomRow;
     // roomID is the entered id, the "Host/Connection Code" of the host that the client connects to. The host's name
     let roomID;
-    // boolean data, true for host, false for client
-    let isHost;
     // string identifier for the host to view
     let nickName;
+    // boolean data, true for host, false for client
+    let isHost = false;
+    // boolean data, true for screen
+    let isScreen = false;
+    // boolean data, true once the connection has been set up, created to prevent sending messages without first doing setup
+    let isValid = false;
     ws.on("message", function incoming(message, isBinary) {
         // console.log(message.toString(), isBinary);
-        // console.log(message);
 
         if (messageType(message, "s", 0)) {                                         //s is startup signifier
             roomID = message.toString().substring(4, 9);
+            nickName = message.toString().substring(10, 20);
             if (messageType(message, "h", 2)) {                                     //Host set up
                 if (hostExists(roomID) === -1) {
-                    roomColumn = hostHole();                                           // Tests for a hole in connections, fills the hole
+                    roomColumn = hostHole();                                        // Tests for a hole in connections, fills the hole
                     if (roomColumn !== -1) {
                         hostList[roomColumn] = roomID;
                         connections[roomColumn][0] = ws;
@@ -60,7 +64,7 @@ wss.on("connection", function connection(ws) {
                     }
                     roomRow = 0;
                     isHost = true;
-                    console.log("Host Created!");
+                    // console.log("Host Created!");
                     ws.send("Host Created!");
 
                 } else {                                                            //Return Error, host already exists
@@ -78,31 +82,44 @@ wss.on("connection", function connection(ws) {
                     roomColumn = host;
                     isHost = false;
                     // console.log("Client Created!");
+                    connections[roomColumn][0].send(`${nickName}:OPEN`);
                     ws.send("Client Created!");
                 } else {                                                            //Send error message, host does not exist
                     // console.log("Error in client connection: host does not exist");
                     ws.send("Error in client connection: host does not exist");
                     ws.close();
                 }
+            } else if (messageType(message, "s", 2)) {                              //Chromecast set up
+                // console.log("Casting screen set up");
+                isScreen = true;
             } else {                                                                //Send error message, invalid input
                 // console.log("Error in connection: invalid input");
-                ws.send("Error in connection: invalid input");
+                ws.send("Error in Connection: Invalid Input");
                 ws.close();
             }
+            isValid = true;
         } else if (messageType(message, "m", 0)) {                                  //If message
-            if (isHost) {                                                           //If message sender is a host
-                connections[roomColumn].forEach(function each(client) {
-                    if (client.readyState === WebSocket.OPEN) {
-                        client.send(message.toString());
-                        // console.log("Sending Message");
-                    }
-                });
-            } else {                                                                //If sender is a client, send messages exclusively to the host
-                connections[roomColumn][0].send(roomRow + ":" + message.toString());
+            if (isValid) {
+                if (isHost) {                                                           //If message sender is a host
+                    connections[roomColumn].forEach(function each(client) {
+                        if (client.readyState === WebSocket.OPEN) {
+                            client.send(message.toString());
+                            // console.log("Sending Message");
+                        }
+                    });
+                } else if (isScreen) {
+
+                } else {                                                                //If sender is a client, send messages exclusively to the host
+                    // connections[roomColumn][0].send(roomRow + ":" + message.toString());            //Sends the number of the client
+                    connections[roomColumn][0].send(nickName + ":" + message.toString());        //Version to be used when nickname is fully implemented
+                }
+            } else {
+                ws.send("Error: Invalid Connection");
+                ws.close();    
             }
         } else {                                                                    //Send error message, invalid input message
             // console.log("Error: invalid Input");
-            ws.send("Error: invalid Input");
+            ws.send("Error in Connection: Invalid Input");
             ws.close();
         }
 
@@ -116,7 +133,7 @@ wss.on("connection", function connection(ws) {
 
     });
     ws.on("close", function () {
-        console.log("Closed connection");
+        // console.log("Closed connection");
         if (isHost) {
             delete hostList[roomColumn];
             // delete connections[roomColumn];
@@ -124,6 +141,8 @@ wss.on("connection", function connection(ws) {
             hostList[roomColumn] = -1;                 //additional change to reuse former room numbers, prevent server overflow
             // connections[roomColumn][0] = -1;
             // console.log("Host Closed. Size of hostList: " + hostList.length);
+        } else {
+            connections[roomColumn][0].send(nickName + ":CLOSED");
         }
         // Currently when a connection closes only the host deletes values
         // When a client closes nothing happens, leaving its value within the connections array
@@ -165,6 +184,5 @@ function hostHole() {
 function deleteClients(clientArray) {
     clientArray.forEach(function each(client) {
         delete client;
-    }
-    );
+    });
 }
