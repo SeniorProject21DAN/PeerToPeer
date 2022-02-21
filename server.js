@@ -42,13 +42,15 @@ wss.on("connection", function connection(ws) {
     let isHost = false;
     // boolean data, true for screen
     let isScreen = false;
+    // boolean data, true once the connection has been set up, created to prevent sending messages without first doing setup
+    let isValid = false;
     ws.on("message", function incoming(message, isBinary) {
         // console.log(message.toString(), isBinary);
         // console.log(message);
 
         if (messageType(message, "s", 0)) {                                         //s is startup signifier
             roomID = message.toString().substring(4, 9);
-            nickName = message.toString().substring(10, 18);
+            nickName = message.toString().substring(10, 20);
             if (messageType(message, "h", 2)) {                                     //Host set up
                 if (hostExists(roomID) === -1) {
                     roomColumn = hostHole();                                        // Tests for a hole in connections, fills the hole
@@ -93,26 +95,32 @@ wss.on("connection", function connection(ws) {
                 isScreen = true;
             } else {                                                                //Send error message, invalid input
                 // console.log("Error in connection: invalid input");
-                ws.send("Error in connection: invalid input");
+                ws.send("Error in Connection: Invalid Input");
                 ws.close();
             }
+            isValid = true;
         } else if (messageType(message, "m", 0)) {                                  //If message
-            if (isHost) {                                                           //If message sender is a host
-                connections[roomColumn].forEach(function each(client) {
-                    if (client.readyState === WebSocket.OPEN) {
-                        client.send(message.toString());
-                        // console.log("Sending Message");
-                    }
-                });
-            } else if (isScreen) {
+            if (isValid) {
+                if (isHost) {                                                           //If message sender is a host
+                    connections[roomColumn].forEach(function each(client) {
+                        if (client.readyState === WebSocket.OPEN) {
+                            client.send(message.toString());
+                            // console.log("Sending Message");
+                        }
+                    });
+                } else if (isScreen) {
 
-            } else {                                                                //If sender is a client, send messages exclusively to the host
-                connections[roomColumn][0].send(roomRow + ":" + message.toString());            //Sends the number of the client
-                // connections[roomColumn][0].send(nickName + ":" + message.toString());        //Version to be used when nickname is fully implemented
+                } else {                                                                //If sender is a client, send messages exclusively to the host
+                    // connections[roomColumn][0].send(roomRow + ":" + message.toString());            //Sends the number of the client
+                    connections[roomColumn][0].send(nickName + ":" + message.toString());        //Version to be used when nickname is fully implemented
+                }
+            } else {
+                ws.send("Error: Invalid Connection");
+                ws.close();    
             }
         } else {                                                                    //Send error message, invalid input message
             // console.log("Error: invalid Input");
-            ws.send("Error: invalid Input");
+            ws.send("Error in Connection: Invalid Input");
             ws.close();
         }
 
@@ -175,6 +183,5 @@ function hostHole() {
 function deleteClients(clientArray) {
     clientArray.forEach(function each(client) {
         delete client;
-    }
-    );
+    });
 }
