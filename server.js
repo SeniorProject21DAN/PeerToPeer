@@ -64,6 +64,7 @@ wss.on("connection", function connection(ws) {
                     }
                     roomRow = 0;
                     isHost = true;
+                    connections[roomColumn].push(null);
                     // console.log("Host Created!");
                     ws.send("Host Created!");
 
@@ -91,7 +92,22 @@ wss.on("connection", function connection(ws) {
                 }
             } else if (messageType(message, "s", 2)) {                              //Chromecast set up
                 // console.log("Casting screen set up");
-                isScreen = true;
+                let host = hostExists(roomID);
+                if (host !== -1) {                                                  //Need to send confirmation message
+                    // connections[host].push(ws);
+                    connections[host][1] = ws;
+                    roomRow = connections.length;                                   //roomRow set to the length of connections, given that connections has just been incremented
+                    roomColumn = host;
+                    isHost = false;
+                    isScreen = true;
+                    // console.log("Client Created!");
+                    // connections[roomColumn][0].send(`SCREEN:OPEN`);
+                    ws.send("SCREEN Created!");
+                } else {                                                            //Send error message, host does not exist
+                    // console.log("Error in client connection: host does not exist");
+                    ws.send("Error in client connection: host does not exist");
+                    ws.close();
+                }
             } else {                                                                //Send error message, invalid input
                 // console.log("Error in connection: invalid input");
                 ws.send("Error in Connection: Invalid Input");
@@ -112,6 +128,7 @@ wss.on("connection", function connection(ws) {
                 } else {                                                                //If sender is a client, send messages exclusively to the host
                     // connections[roomColumn][0].send(roomRow + ":" + message.toString());            //Sends the number of the client
                     connections[roomColumn][0].send(nickName + ":" + message.toString());        //Version to be used when nickname is fully implemented
+                    connections[roomColumn][1].send(nickName + ":" + message.toString());        //Send to screen
                 }
             } else {
                 ws.send("Error: Invalid Connection");
