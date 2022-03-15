@@ -3,7 +3,7 @@ const WebSocket = require("ws");
 var example = new WebSocket("ws:153.106.226.103:8080");
 
 example.onopen = function (event) {
-    example.send("s:h:baker");
+    example.send("s:s:baker");
 }
 
 example.onmessage = function (event) {

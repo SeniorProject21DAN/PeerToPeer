@@ -64,7 +64,7 @@ wss.on("connection", function connection(ws) {
                     }
                     roomRow = 0;
                     isHost = true;
-                    connections[roomColumn].push(null);
+                    connections[roomColumn][1] = null;
                     nickName = "HOST";
                     // console.log("Host Created!");
                     ws.send("Host Created!");
@@ -95,14 +95,20 @@ wss.on("connection", function connection(ws) {
                 // console.log("Casting screen set up");
                 let host = hostExists(roomID);
                 if (host !== -1) {                                                  //Need to send confirmation message
-                    // connections[host].push(ws);
+
                     connections[host][1] = ws;
+
+                    // console.log(connections[host][1]);
+
+                    // connections[host].push(ws);
+
                     roomRow = connections.length;                                   //roomRow set to the length of connections, given that connections has just been incremented
                     roomColumn = host;
                     isHost = false;
                     isScreen = true;
                     // console.log("Client Created!");
-                    // connections[roomColumn][0].send(`SCREEN:OPEN`);
+                    connections[roomColumn][0].send(`SCREEN:OPEN`);
+                    connections[roomColumn][1].send(`SCREEN:OPEN`);
                     ws.send("SCREEN Created!");
                 } else {                                                            //Send error message, host does not exist
                     // console.log("Error in client connection: host does not exist");
@@ -129,7 +135,13 @@ wss.on("connection", function connection(ws) {
                 } else {                                                                //If sender is a client, send messages exclusively to the host
                     // connections[roomColumn][0].send(roomRow + ":" + message.toString());            //Sends the number of the client
                     connections[roomColumn][0].send(nickName + ":" + message.toString());        //Version to be used when nickname is fully implemented
-                    if (connections[roomColumn[1] != null]) {
+                    
+                    if (connections[roomColumn][1] === null) {
+                        console.log("Screen is null object");
+                    } else {
+                        // console.log(connections[roomColumn][1]);
+                        // console.log(undefined);
+                        // console.log(roomColumn[1])
                         connections[roomColumn][1].send(nickName + ":" + message.toString());        //Send to screen
                     }
                 }
@@ -155,14 +167,13 @@ wss.on("connection", function connection(ws) {
     ws.on("close", function () {
         // console.log("Closed connection");
         if (isHost) {
-            delete hostList[roomColumn];
-            // delete connections[roomColumn];
+            // delete hostList[roomColumn];
             deleteClients(connections[roomColumn]);
             hostList[roomColumn] = -1;                 //additional change to reuse former room numbers, prevent server overflow
             // connections[roomColumn][0] = -1;
             // console.log("Host Closed. Size of hostList: " + hostList.length);
         } else {
-            connections[roomColumn][0].send(nickName + ":CLOSED");
+            // connections[roomColumn][0].send(nickName + ":CLOSED");
         }
         // Currently when a connection closes only the host deletes values
         // When a client closes nothing happens, leaving its value within the connections array
@@ -202,7 +213,13 @@ function hostHole() {
 }
 
 function deleteClients(clientArray) {
+    // for(let i = 1; i < clientArray.length; i += 1){
+    //     clientArray[i].close();
+    // }
+
+
     clientArray.forEach(function each(client) {
+        // client.close();
         delete client;
     });
 }
