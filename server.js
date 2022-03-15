@@ -65,13 +65,14 @@ wss.on("connection", function connection(ws) {
                     roomRow = 0;
                     isHost = true;
                     connections[roomColumn].push(null);
+                    nickName = "HOST";
                     // console.log("Host Created!");
                     ws.send("Host Created!");
 
                 } else {                                                            //Return Error, host already exists
                     // console.log("Error in host connection: host already exists");
                     ws.send("Error in host connection: host already exists");
-                    ws.close();
+                    // ws.close();
                 }
             } else if (messageType(message, "c", 2)) {                              //Client or player set up 
 
@@ -88,7 +89,7 @@ wss.on("connection", function connection(ws) {
                 } else {                                                            //Send error message, host does not exist
                     // console.log("Error in client connection: host does not exist");
                     ws.send("Error in client connection: host does not exist");
-                    ws.close();
+                    // ws.close();
                 }
             } else if (messageType(message, "s", 2)) {                              //Chromecast set up
                 // console.log("Casting screen set up");
@@ -106,12 +107,12 @@ wss.on("connection", function connection(ws) {
                 } else {                                                            //Send error message, host does not exist
                     // console.log("Error in client connection: host does not exist");
                     ws.send("Error in client connection: host does not exist");
-                    ws.close();
+                    // ws.close();
                 }
             } else {                                                                //Send error message, invalid input
                 // console.log("Error in connection: invalid input");
                 ws.send("Error in Connection: Invalid Input");
-                ws.close();
+                // ws.close();
             }
             isValid = true;
         } else if (messageType(message, "m", 0)) {                                  //If message
@@ -119,7 +120,7 @@ wss.on("connection", function connection(ws) {
                 if (isHost) {                                                           //If message sender is a host
                     connections[roomColumn].forEach(function each(client) {
                         if (client.readyState === WebSocket.OPEN) {
-                            client.send(message.toString());
+                            client.send(nickName + ":" + message.toString());
                             // console.log("Sending Message");
                         }
                     });
@@ -132,12 +133,12 @@ wss.on("connection", function connection(ws) {
                 }
             } else {
                 ws.send("Error: Invalid Connection");
-                ws.close();    
+                // ws.close();
             }
         } else {                                                                    //Send error message, invalid input message
             // console.log("Error: invalid Input");
             ws.send("Error in Connection: Invalid Input");
-            ws.close();
+            // ws.close();
         }
 
         // CODE TO MAKE SERVER ECHO ALL INPUT MESSAGES
