@@ -12,7 +12,7 @@
 
 const express = require("express");
 const app = express();
-const http = require("http");
+const https = require("https");
 const WebSocket = require("ws");
 
 // Single dimension array storing name of host, used for host setup and client setup 
@@ -21,7 +21,7 @@ const hostList = new Array();
 const connections = new Array();
 const players = new Array();
 
-const server = http.createServer(app);
+const server = https.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 // WORK TO BE DONE:
