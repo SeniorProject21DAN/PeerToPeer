@@ -27,8 +27,8 @@
     "react-native-screens": "~3.4.0",
     "react-native-web": "~0.13.12",
     "react-native-webrtc": "^1.92.2",
-    "socket.io": "^4.2.0",
-    "socket.io-client": "^4.3.2",
+    "socket.io": "4.2.0",
+    "socket.io-client": "4.3.2",
     "ws": "^8.2.3"
   },
   "devDependencies": {
