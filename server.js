@@ -19,6 +19,7 @@ const WebSocket = require("ws");
 const hostList = new Array();
 // Two dimensional array storing websocket address of host in [0] and of connected client n in [n]
 const connections = new Array();
+const players = new Array();
 
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
@@ -50,6 +51,7 @@ wss.on("connection", function connection(ws) {
         if (messageType(message, "s", 0)) {                                         //s is startup signifier
             roomID = message.toString().substring(4, 9);
             nickName = message.toString().substring(10, 20);
+            console.log("Connection added to " + roomID + ": " + nickName)
             if (messageType(message, "h", 2)) {                                     //Host set up
                 if (hostExists(roomID) === -1) {
                     roomColumn = hostHole();                                        // Tests for a hole in connections, fills the hole
@@ -59,8 +61,11 @@ wss.on("connection", function connection(ws) {
                     } else {                                                        // Creates new slot in the hostList
                         hostList.push(roomID);
                         connections.push(new Array());
+                        players.push(new Array())
                         roomColumn = connections.length - 1;
                         connections[roomColumn].push(ws);
+                        players[roomColumn].push("Host");
+                        players[roomColumn].push("");
                     }
                     roomRow = 0;
                     isHost = true;
@@ -80,6 +85,7 @@ wss.on("connection", function connection(ws) {
                 // console.log("Host Number: " + host);
                 if (host !== -1) {                                                  //Need to send confirmation message
                     connections[host].push(ws);
+                    players[host].push(nickName);
                     roomRow = connections.length;                                   //roomRow set to the length of connections, given that connections has just been incremented
                     roomColumn = host;
                     isHost = false;
@@ -122,6 +128,7 @@ wss.on("connection", function connection(ws) {
             }
             isValid = true;
         } else if (messageType(message, "m", 0)) {                                  //If message
+            //console.log("Message received: " + message);
             if (isValid) {
                 if (isHost) {                                                           //If message sender is a host
                     connections[roomColumn].forEach(function each(client) {
@@ -135,9 +142,9 @@ wss.on("connection", function connection(ws) {
                 } else {                                                                //If sender is a client, send messages exclusively to the host
                     // connections[roomColumn][0].send(roomRow + ":" + message.toString());            //Sends the number of the client
                     connections[roomColumn][0].send(nickName + ":" + message.toString());        //Version to be used when nickname is fully implemented
-                    
+
                     if (connections[roomColumn][1] === null) {
-                        console.log("Screen is null object");
+                        //console.log("Screen is null object");
                     } else {
                         // console.log(connections[roomColumn][1]);
                         // console.log(undefined);
@@ -149,6 +156,18 @@ wss.on("connection", function connection(ws) {
                 ws.send("Error: Invalid Connection");
                 ws.close();
             }
+        } else if (messageType(message, "p", 0)) { //Private message to one player
+            console.log("Message received: " + message);
+
+            roomID = message.toString().split(":")[2];
+            nickName = message.toString().split(":")[4];
+            let host = hostExists(roomID);
+            let player = players[host].indexOf(nickName);
+            if(player !== -1) {
+                console.log(message.toString().split(":")[4]);
+                connections[roomColumn][player].send(message.toString().split(":")[3] + ":p:" + message.toString().split(":")[5]);
+            }
+
         } else {                                                                    //Send error message, invalid input message
             // console.log("Error: invalid Input");
             ws.send("Error in Connection: Invalid Input");
