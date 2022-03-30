@@ -12,7 +12,7 @@
 
 const express = require("express");
 const app = express();
-const https = require("https");
+const http = require("http");
 const WebSocket = require("ws");
 
 // Single dimension array storing name of host, used for host setup and client setup 
@@ -21,7 +21,7 @@ const hostList = new Array();
 const connections = new Array();
 const players = new Array();
 
-const server = https.createServer(app);
+const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 // WORK TO BE DONE:
@@ -64,7 +64,7 @@ wss.on("connection", function connection(ws) {
                         players.push(new Array())
                         roomColumn = connections.length - 1;
                         connections[roomColumn].push(ws);
-                        players[roomColumn].push("Host");
+                        players[roomColumn].push("host");
                         players[roomColumn].push("");
                     }
                     roomRow = 0;
@@ -163,7 +163,9 @@ wss.on("connection", function connection(ws) {
             nickName = message.toString().split(":")[4];
             let host = hostExists(roomID);
             let player = players[host].indexOf(nickName);
+            console.log(player);
             if(player !== -1) {
+                console.log(connections[roomColumn].length);
                 console.log(message.toString().split(":")[4]);
                 connections[roomColumn][player].send(message.toString().split(":")[3] + ":p:" + message.toString().split(":")[5]);
             }
