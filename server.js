@@ -132,7 +132,7 @@ wss.on("connection", function connection(ws) {
             if (isValid) {
                 if (isHost) {                                                           //If message sender is a host
                     connections[roomColumn].forEach(function each(client) {
-                        if (client.readyState === WebSocket.OPEN) {
+                        if (client && client.readyState === WebSocket.OPEN) {
                             client.send(nickName + ":" + message.toString());
                             // console.log("Sending Message");
                         }
