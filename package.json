@@ -15,7 +15,7 @@
     "expo-status-bar": "~1.0.4",
     "express": "^4.17.1",
     "http": "0.0.1-security",
-    "laravel-echo": "^1.11.3",
+    "laravel-echo": "1.14.0",
     "net": "^1.0.2",
     "react": "16.13.1",
     "react-dom": "16.13.1",
